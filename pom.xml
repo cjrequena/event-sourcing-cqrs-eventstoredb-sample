@@ -24,7 +24,8 @@
         <spring-cloud-dependencies.version>2021.0.1</spring-cloud-dependencies.version>
         <!-- https://mvnrepository.com/artifact/org.springdoc/springdoc-openapi-webflux-ui -->
         <!-- https://mvnrepository.com/artifact/org.springdoc/springdoc-openapi-ui -->
-        <springdoc.version>1.5.12</springdoc.version>
+        <springdoc.version>1.6.6</springdoc.version>
+        <com.eventstore.db-client-java.version>2.0.0</com.eventstore.db-client-java.version>
         <!--https://mvnrepository.com/artifact/org.mapstruct/mapstruct-->
         <mapstruct.version>1.4.2.Final</mapstruct.version>
     </properties>
