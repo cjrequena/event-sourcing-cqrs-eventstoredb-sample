@@ -28,23 +28,23 @@ services:
       sample-network:
     restart: unless-stopped
   #---------------------------------------------------------------------------------------------------------------------
-#  postgres:
-#    image: postgres
-#    container_name: postgres
-#    hostname: postgres
-#    environment:
-#      POSTGRES_USER: ${POSTGRES_USER:-postgres}
-#      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
-#      PGDATA: /data/postgres
-#    ports:
-#      - "5432:5432"
-#    volumes:
-#      - type: volume
-#        source: postgres-volume-data
-#        target: /data/postgres
-#    networks:
-#      sample-network:
-#    restart: unless-stopped
+  postgres:
+    image: postgres
+    container_name: postgres
+    hostname: postgres
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      PGDATA: /data/postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - type: volume
+        source: postgres-volume-data
+        target: /data/postgres
+    networks:
+      sample-network:
+    restart: unless-stopped
 
 networks:
   sample-network:
