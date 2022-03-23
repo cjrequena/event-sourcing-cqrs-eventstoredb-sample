@@ -10,7 +10,6 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-
 @Data
 @Configuration
 @ConfigurationProperties("eventstoredb")
@@ -34,7 +33,7 @@ public class EventStoreDBConfiguration {
   }
 
   @Bean
-  public EventStoreDBPersistentSubscriptionsClient persistentSubscriptionsClient() {
+  public EventStoreDBPersistentSubscriptionsClient eventStoreDBPersistentSubscriptionsClient() {
     EventStoreDBClientSettings settings = EventStoreDBConnectionString.parseOrThrow(connectionString);
     return EventStoreDBPersistentSubscriptionsClient.create(settings);
   }

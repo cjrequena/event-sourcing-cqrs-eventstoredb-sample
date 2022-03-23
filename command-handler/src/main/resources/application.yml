@@ -131,6 +131,5 @@ springdoc:
 # EventStoreDB configuration
 eventstoredb:
   connection-string: esdb://localhost:2113?tls=false
-  persistent-subscription:
-    group: command-handler
-    buffer-size: 32
+
+

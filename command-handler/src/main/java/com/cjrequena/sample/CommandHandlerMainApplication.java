@@ -10,7 +10,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 public class CommandHandlerMainApplication implements CommandLineRunner {
 
 //  @Autowired
-//  BankAccountEventStoreService bankAccountEventStoreService;
+//  EventStoreService bankAccountEventStoreService;
 
   public static void main(String[] args) {
     SpringApplication.run(CommandHandlerMainApplication.class, args);

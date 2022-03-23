@@ -3,7 +3,6 @@ package com.cjrequena.sample.configuration;
 import com.eventstore.dbclient.EventStoreDBClient;
 import com.eventstore.dbclient.EventStoreDBClientSettings;
 import com.eventstore.dbclient.EventStoreDBConnectionString;
-import com.eventstore.dbclient.EventStoreDBPersistentSubscriptionsClient;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -31,11 +30,5 @@ public class EventStoreDBConfiguration {
   public EventStoreDBClient eventStoreDBClient() {
     EventStoreDBClientSettings settings = EventStoreDBConnectionString.parseOrThrow(connectionString);
     return EventStoreDBClient.create(settings);
-  }
-
-  @Bean
-  public EventStoreDBPersistentSubscriptionsClient persistentSubscriptionsClient() {
-    EventStoreDBClientSettings settings = EventStoreDBConnectionString.parseOrThrow(connectionString);
-    return EventStoreDBPersistentSubscriptionsClient.create(settings);
   }
 }

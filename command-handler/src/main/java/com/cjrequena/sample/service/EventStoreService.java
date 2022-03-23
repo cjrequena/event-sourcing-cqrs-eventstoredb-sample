@@ -33,11 +33,10 @@ import static com.eventstore.dbclient.ExpectedRevision.expectedRevision;
 @Slf4j
 @Service
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
-public class BankAccountEventStoreService {
+public class EventStoreService {
 
   private final EventStoreDBClient eventStoreDBClient;
-  private final EventStoreDBPersistentSubscriptionsClient persistentSubscriptionsClient;
-  private final EventStoreDBConfiguration configuration;
+  private final EventStoreDBConfiguration eventStoreDBConfiguration;
 
   @SneakyThrows
   public void appendEvent(Event event) {

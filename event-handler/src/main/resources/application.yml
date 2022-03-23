@@ -16,7 +16,7 @@ info:
   git.remote.origin.url: ${git.remote.origin.url}
 
 server.servlet.context-path: / # Context path of the application.
-server.port: ${SERVER_PORT:8080} # Server HTTP port.
+server.port: ${SERVER_PORT:7080} # Server HTTP port.
 
 spring:
   application:
@@ -107,6 +107,41 @@ management.info.env.enabled: true # Whether to enable environment info.
 management.info.git.enabled: true # Whether to enable git info.
 management.info.git.mode: full # Mode to use to expose git information.
 
+# H2
+#spring.datasource.h2.url: jdbc:h2:mem:testdb;MODE=PostgreSQL
+#spring.datasource.h2.driverClassName: org.h2.Driver
+#spring.datasource.h2.username: sa
+#spring.h2.console.enabled: true
+
+# Postgres
+spring.datasource.postgres.type: com.zaxxer.hikari.HikariDataSource
+spring.datasource.postgres.jdbcUrl: jdbc:postgresql://${POSTGRES_HOST:localhost}:5432/postgres
+spring.datasource.postgres.driver-class-name: org.postgresql.Driver
+spring.datasource.postgres.username: postgres
+spring.datasource.postgres.password: postgres
+
+# https://github.com/brettwooldridge/HikariCP#configuration-knobs-baby
+spring.datasource.postgres.pool-name: HikariPool
+spring.datasource.postgres.connection-timeout: 20000
+spring.datasource.postgres.minimum-idle: 5
+spring.datasource.postgres.maximum-pool-size: 12
+spring.datasource.postgres.idle-timeout: 300000
+spring.datasource.postgres.max-lifetime: 1200000
+spring.datasource.postgres.auto-commit: false
+
+# JPA specific configs
+spring.jpa.open-in-view: false
+#spring.jpa.properties.hibernate.connection.provider_class: org.hibernate.hikaricp.internal.HikariCPConnectionProvider
+spring.jpa.database-platform: org.hibernate.dialect.PostgreSQL95Dialect
+spring.jpa.properties.hibernate.dialect: org.hibernate.dialect.PostgreSQL95Dialect
+spring.jpa.properties.hibernate.show_sql: false
+spring.jpa.properties.hibernate.format_sql: true
+spring.jpa.properties.hibernate.use_sql: true
+spring.jpa.properties.hibernate.hibernate.dialect: true
+spring.jpa.properties.hibernate.id.new_generator_mappings: false
+spring.jpa.properties.hibernate.search.autoregister_listeners: false
+spring.jpa.properties.hibernate.bytecode.use_reflection_optimizer: false
+
 # LOGGING
 logging.config: classpath:log4j2-local.xml # Location of the logging configuration file. For instance, `classpath:logback.xml` for Logback.
 logging.file: log4j2-local.xml # Log file name (for instance, `myapp.log`). Names can be an exact location or relative to the current directory.
@@ -117,20 +152,9 @@ logging.level: # Log levels severity mapping. For instance, `logging.level.org.s
   org.hibernate.type.descriptor.sql.BasicBinder: ERROR
   org.flywaydb: INFO
 
-# swagger configuration
-springdoc:
-  api-docs:
-    groups:
-      enabled: true
-  swagger-ui:
-    path: /swagger-ui.html
-    display-request-duration: true
-    groups-order: DESC
-  version: '@springdoc.version@'
-
 # EventStoreDB configuration
 eventstoredb:
   connection-string: esdb://localhost:2113?tls=false
   persistent-subscription:
-    group: command-handler
+    group: consumer-group-01
     buffer-size: 32

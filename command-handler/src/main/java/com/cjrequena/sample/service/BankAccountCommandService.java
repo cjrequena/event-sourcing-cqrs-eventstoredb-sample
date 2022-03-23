@@ -36,7 +36,7 @@ import java.util.List;
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class BankAccountCommandService {
 
-  private final BankAccountEventStoreService bankAccountEventStoreService;
+  private final EventStoreService bankAccountEventStoreService;
   private final BankAccountMapper bankAccountMapper;
 
   public void handler(Command command)
