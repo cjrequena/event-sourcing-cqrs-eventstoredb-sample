@@ -158,3 +158,10 @@ eventstoredb:
   persistent-subscription:
     group: consumer-group-01
     buffer-size: 32
+
+# flyway
+spring.flyway:
+  enabled: false
+  #locations: classpath:/db/migration
+  #locations: classpath:/db/migration/h2
+  locations: classpath:/db/migration/postgres

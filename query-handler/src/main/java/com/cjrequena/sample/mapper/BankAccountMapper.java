@@ -13,4 +13,6 @@ public interface BankAccountMapper {
 
   BankAccountEntity toEntity(BankAccountDTO dto);
 
+  BankAccountDTO toDTO(BankAccountEntity entity);
+
 }
