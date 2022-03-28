@@ -1,5 +1,11 @@
 # event-sourcing-cqrs-eventstoredb-sample
 
+# Resources and References
+- [Modelling Reactive Systems with Event Storming and Domain-Driven Design](https://blog.redelastic.com/corporate-arts-crafts-modelling-reactive-systems-with-event-storming-73c6236f5dd7)
+- [Event Sourcing and CQRS](https://www.eventstore.com/blog/event-sourcing-and-cqrs)
+- [EventStoreDB is the database for Event Sourcing](https://reposhub.com/java/distributed-databases/evgeniy-khist-eventstoredb-event-sourcing.html?utm_source=pocket_mylist)
+
+---
 **Abstract.** Event Sourcing is a great way to automatically update state and publish events. The traditional way to persist an entity is to save its current
 state into a database. In Event Sourcing, a business object is persisted by storing a sequence of states changing events. Whenever an object's state changes,
 a new event is appended to the sequence of events. An entity's current state is reconstructed by replaying its events. Events are persisted in an Event Store,
