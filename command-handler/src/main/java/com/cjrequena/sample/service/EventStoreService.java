@@ -39,14 +39,11 @@ public class EventStoreService {
   private final EventStoreDBConfiguration eventStoreDBConfiguration;
 
   @SneakyThrows
-  public void appendEvent(Event event) {
+  public void appendEvent(Event event, Long expectedVersion) {
     try {
       Objects.requireNonNull(event);
       EventData eventData = EventData.builderAsJson(event.getType().getValue(), event).build();
-      AppendToStreamOptions options =
-        AppendToStreamOptions.get()
-          .expectedRevision(
-            (event.getVersion() != null && event.getVersion() >= 0) ? expectedRevision(event.getVersion()) : NO_STREAM);
+      AppendToStreamOptions options = AppendToStreamOptions.get().expectedRevision(expectedVersion != null ? expectedRevision(expectedVersion) : NO_STREAM);
       eventStoreDBClient
         .appendToStream(EventStoreDBUtils.toStream(event.getAggregateId()), options, eventData)
         .get()
@@ -62,7 +59,7 @@ public class EventStoreService {
           actualRevision,
           event.getVersion());
         throw new OptimisticConcurrencyServiceException(
-          "Optimistic concurrency control error in aggregate " + event.getAggregateId() + " :: actual version " + actualRevision + " :: doesn't match expected version :: " + event.getVersion());
+          "Optimistic concurrency control error in aggregate " + event.getAggregateId() + " :: actual version " + actualRevision + " :: doesn't match expected version :: " + expectedVersion);
       }
       throw ex;
     }

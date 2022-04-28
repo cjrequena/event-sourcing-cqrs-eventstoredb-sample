@@ -22,7 +22,7 @@ public class CreateBankAccountCommand extends Command<BankAccountDTO> implements
 
   @Builder
   public CreateBankAccountCommand(BankAccountDTO bankAccountDTO) {
-    super(UUID.randomUUID(), ECommandType.CREATE_BANK_ACCOUNT_COMMAND, bankAccountDTO, null);
+    super(UUID.randomUUID(), ECommandType.CREATE_BANK_ACCOUNT_COMMAND, bankAccountDTO, 0L);
     bankAccountDTO.setId(super.aggregateId);
   }
 }

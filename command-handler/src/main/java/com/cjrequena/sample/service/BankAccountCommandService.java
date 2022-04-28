@@ -39,19 +39,17 @@ public class BankAccountCommandService {
   private final EventStoreService bankAccountEventStoreService;
   private final BankAccountMapper bankAccountMapper;
 
-  public void handler(Command command)
-    throws AggregateNotFoundServiceException, OptimisticConcurrencyServiceException, DuplicatedAggregateServiceException, BankAccountServiceException {
+  public void handler(Command command) throws AggregateNotFoundServiceException, OptimisticConcurrencyServiceException, DuplicatedAggregateServiceException, BankAccountServiceException {
     log.debug("Command type: {} Command aggregate_id: {}", command.getType(), command.getAggregateId());
     // Retrieve the whole event history by a specific aggregate id
     List<Event> events = this.bankAccountEventStoreService.retrieveEventsByAggregateId(command.getAggregateId());
     // Recreate the last aggregate snapshot replaying the whole event history by a specific aggregate id
     BankAccountAggregate bankAccountAggregate = new BankAccountAggregate(command.getAggregateId(), events);
+    // Process the command
     this.process(command, bankAccountAggregate);
   }
 
-  
-  public void process(Command command, BankAccountAggregate bankAccountAggregate)
-    throws OptimisticConcurrencyServiceException, DuplicatedAggregateServiceException, AggregateNotFoundServiceException, BankAccountServiceException {
+  public void process(Command command, BankAccountAggregate bankAccountAggregate) throws BankAccountServiceException {
 
     final BankAccountDTO bankAccountDTO = bankAccountAggregate.getBankAccountDTO();
 
@@ -75,32 +73,27 @@ public class BankAccountCommandService {
       if (data.getAmount().compareTo(BigDecimal.ZERO) <= 0) {
         throw new BankAccountServiceException("Amount must be greater than 0");
       }
-      if(bankAccountDTO.getBalance().subtract(data.getAmount()).compareTo(BigDecimal.ZERO)<0){
+      if (bankAccountDTO.getBalance().subtract(data.getAmount()).compareTo(BigDecimal.ZERO) < 0) {
         throw new BankAccountServiceException("Insufficient balance");
       }
       this.process(withdrawBankAccountCommand);
     }
   }
 
-  
-  public void process(CreateBankAccountCommand command)
-    throws OptimisticConcurrencyServiceException, DuplicatedAggregateServiceException, AggregateNotFoundServiceException {
+  public void process(CreateBankAccountCommand command) {
     BankAccountCratedEvent event = this.bankAccountMapper.toEvent(command);
-    bankAccountEventStoreService.appendEvent(event);
+    bankAccountEventStoreService.appendEvent(event, null);
   }
 
-  
-  public void process(DepositBankAccountCommand command)
-    throws OptimisticConcurrencyServiceException, DuplicatedAggregateServiceException, AggregateNotFoundServiceException {
-
+  public void process(DepositBankAccountCommand command) {
     BankAccountDepositedEvent event = this.bankAccountMapper.toEvent(command);
-    bankAccountEventStoreService.appendEvent(event);
+    event.setVersion(command.getVersion() + 1);
+    bankAccountEventStoreService.appendEvent(event, command.getVersion());
   }
 
-  
-  public void process(WithdrawBankAccountCommand command)
-    throws OptimisticConcurrencyServiceException, DuplicatedAggregateServiceException, AggregateNotFoundServiceException {
+  public void process(WithdrawBankAccountCommand command) {
     BankAccountWithdrawnEvent event = this.bankAccountMapper.toEvent(command);
-    bankAccountEventStoreService.appendEvent(event);
+    event.setVersion(command.getVersion() + 1);
+    bankAccountEventStoreService.appendEvent(event, command.getVersion());
   }
 }
