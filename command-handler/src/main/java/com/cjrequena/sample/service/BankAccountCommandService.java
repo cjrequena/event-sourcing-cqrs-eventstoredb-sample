@@ -58,21 +58,21 @@ public class BankAccountCommandService {
     if (command.getType().equals(ECommandType.CREATE_BANK_ACCOUNT_COMMAND)) {
       CreateBankAccountCommand createBankAccountCommand = (CreateBankAccountCommand) command;
       final BankAccountDTO data = createBankAccountCommand.getData();
-      if (data.getBalance().compareTo(BigDecimal.ZERO) <= 0) {
+      if (data.getBalance().compareTo(BigDecimal.ZERO) < 0) {
         throw new BankAccountServiceException("Balance must be equal or greater than 0");
       }
       this.process(createBankAccountCommand);
     } else if (command.getType().equals(ECommandType.DEPOSIT_BANK_ACCOUNT_COMMAND)) {
       DepositBankAccountCommand depositBankAccountCommand = (DepositBankAccountCommand) command;
       final DepositBankAccountDTO data = depositBankAccountCommand.getData();
-      if (data.getAmount().compareTo(BigDecimal.ZERO) <= 0) {
+      if (data.getAmount().compareTo(BigDecimal.ZERO) < 0) {
         throw new BankAccountServiceException("Amount must be greater than 0");
       }
       this.process(depositBankAccountCommand);
     } else if (command.getType().equals(ECommandType.WITHDRAW_BANK_ACCOUNT_COMMAND)) {
       WithdrawBankAccountCommand withdrawBankAccountCommand = (WithdrawBankAccountCommand) command;
       final WithdrawBankAccountDTO data = withdrawBankAccountCommand.getData();
-      if (data.getAmount().compareTo(BigDecimal.ZERO) <= 0) {
+      if (data.getAmount().compareTo(BigDecimal.ZERO) < 0) {
         throw new BankAccountServiceException("Amount must be greater than 0");
       }
       if(bankAccountDTO.getBalance().subtract(data.getAmount()).compareTo(BigDecimal.ZERO)<=0){
