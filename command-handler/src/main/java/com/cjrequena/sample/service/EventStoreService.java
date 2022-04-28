@@ -62,8 +62,7 @@ public class EventStoreService {
           actualRevision,
           event.getVersion());
         throw new OptimisticConcurrencyServiceException(
-          "Optimistic concurrency control error in aggregate :: " + event.getAggregateId() + " actual version " + actualRevision + "doesn't match expected version :: "
-            + event.getVersion());
+          "Optimistic concurrency control error in aggregate " + event.getAggregateId() + " :: actual version " + actualRevision + " :: doesn't match expected version :: " + event.getVersion());
       }
       throw ex;
     }
