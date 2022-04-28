@@ -13,5 +13,5 @@ RUN apt-get update && apt-get install -y curl jq
 #RUN sed -i "s/#networkaddress.cache.ttl=-1/networkaddress.cache.ttl=60/g"  $JAVA_HOME/lib/security/java.security
 
 #
-EXPOSE 8080
+EXPOSE 9080
 ENTRYPOINT ["/entrypoint.sh"]
