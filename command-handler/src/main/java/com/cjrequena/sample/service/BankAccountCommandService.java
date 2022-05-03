@@ -9,12 +9,10 @@ import com.cjrequena.sample.event.BankAccountCratedEvent;
 import com.cjrequena.sample.event.BankAccountDepositedEvent;
 import com.cjrequena.sample.event.BankAccountWithdrawnEvent;
 import com.cjrequena.sample.event.Event;
-import com.cjrequena.sample.exception.service.AggregateNotFoundServiceException;
-import com.cjrequena.sample.exception.service.BankAccountServiceException;
-import com.cjrequena.sample.exception.service.DuplicatedAggregateServiceException;
-import com.cjrequena.sample.exception.service.OptimisticConcurrencyServiceException;
+import com.cjrequena.sample.exception.service.*;
 import com.cjrequena.sample.mapper.BankAccountMapper;
 import lombok.RequiredArgsConstructor;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -39,7 +37,8 @@ public class BankAccountCommandService {
   private final EventStoreService bankAccountEventStoreService;
   private final BankAccountMapper bankAccountMapper;
 
-  public void handler(Command command) throws AggregateNotFoundServiceException, OptimisticConcurrencyServiceException, DuplicatedAggregateServiceException, BankAccountServiceException {
+  public void handler(Command command)
+    throws AggregateNotFoundServiceException, OptimisticConcurrencyServiceException, DuplicatedAggregateServiceException, BankAccountServiceException {
     log.debug("Command type: {} Command aggregate_id: {}", command.getType(), command.getAggregateId());
     // Retrieve the whole event history by a specific aggregate id
     List<Event> events = this.bankAccountEventStoreService.retrieveEventsByAggregateId(command.getAggregateId());
@@ -49,9 +48,8 @@ public class BankAccountCommandService {
     this.process(command, bankAccountAggregate);
   }
 
-  public void process(Command command, BankAccountAggregate bankAccountAggregate) throws BankAccountServiceException {
-
-    final BankAccountDTO bankAccountDTO = bankAccountAggregate.getBankAccountDTO();
+  @SneakyThrows
+  public void process(Command command, BankAccountAggregate bankAccountAggregate) {
 
     if (command.getType().equals(ECommandType.CREATE_BANK_ACCOUNT_COMMAND)) {
       CreateBankAccountCommand createBankAccountCommand = (CreateBankAccountCommand) command;
@@ -66,6 +64,9 @@ public class BankAccountCommandService {
       if (data.getAmount().compareTo(BigDecimal.ZERO) <= 0) {
         throw new BankAccountServiceException("Amount must be greater than 0");
       }
+      if (bankAccountAggregate.getBankAccountDTO() == null && bankAccountAggregate.getVersion() == null) {
+        throw new AggregateNotFoundServiceException("Bank account " + bankAccountAggregate.getId() +  " not found");
+      }
       this.process(depositBankAccountCommand);
     } else if (command.getType().equals(ECommandType.WITHDRAW_BANK_ACCOUNT_COMMAND)) {
       WithdrawBankAccountCommand withdrawBankAccountCommand = (WithdrawBankAccountCommand) command;
@@ -73,7 +74,10 @@ public class BankAccountCommandService {
       if (data.getAmount().compareTo(BigDecimal.ZERO) <= 0) {
         throw new BankAccountServiceException("Amount must be greater than 0");
       }
-      if (bankAccountDTO.getBalance().subtract(data.getAmount()).compareTo(BigDecimal.ZERO) < 0) {
+      if (bankAccountAggregate.getBankAccountDTO() == null && bankAccountAggregate.getVersion() == null) {
+        throw new AggregateNotFoundServiceException("Bank account " + bankAccountAggregate.getId() +  " not found");
+      }
+      if (bankAccountAggregate.getBankAccountDTO().getBalance().subtract(data.getAmount()).compareTo(BigDecimal.ZERO) < 0) {
         throw new BankAccountServiceException("Insufficient balance");
       }
       this.process(withdrawBankAccountCommand);

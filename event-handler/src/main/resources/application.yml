@@ -155,6 +155,7 @@ logging.level: # Log levels severity mapping. For instance, `logging.level.org.s
 # EventStoreDB configuration
 eventstoredb:
   connection-string: esdb://localhost:2113?tls=false
+  #connection-string: esdb://crequena:requena123@10.85.52.155:2113?tls=true
   persistent-subscription:
     group: consumer-group-01
     buffer-size: 32
