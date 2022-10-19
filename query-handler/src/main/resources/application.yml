@@ -1,90 +1,10 @@
-# INFO
-info:
-  service_name: ${spring.application.name}
-  maven_version: ${project.version}
-  git.dirty: ${git.dirty}
-  git.branch: ${git.branch}
-  git.tags: ${git.tags}
-  git.build.time: ${git.build.time}
-  git.build.version: ${git.build.version}
-  git.closest.tag.name: ${git.closest.tag.name}
-  git.commit.time: ${git.commit.time}
-  git.commit.id: ${git.commit.id}
-  git.commit.id.abbrev: ${git.commit.id.abbrev}
-  git.commit.user.name: ${git.commit.user.name}
-  git.commit.user.email: ${git.commit.user.email}
-  git.remote.origin.url: ${git.remote.origin.url}
-
 server.servlet.context-path: / # Context path of the application.
 server.port: ${SERVER_PORT:9080} # Server HTTP port.
-
-spring:
-  application:
-    name: query-handler
-  profiles:
-    active: ${SPRING_PROFILES_ACTIVE:local}
-  cloud:
-    consul:
-      host: ${SPRING_CLOUD_CONSUL_HOST:localhost}
-      port: ${SPRING_CLOUD_CONSUL_PORT:8500}
-      enabled: ${SPRING_CLOUD_CONSUL_ENABLED:false}
-      discovery:
-        # Service name
-        serviceName: ${spring.application.name}
-        # Unique service instance id
-        #instanceId: ${spring.application.name}:${random.value}
-        instanceId: ${spring.application.name}:${server.port}
-        # Is service discovery enabled?
-        enabled: ${SPRING_CLOUD_CONSUL_DISCOVERY_ENABLED:false}
-        # Register as a service in consul.
-        register: ${SPRING_CLOUD_CONSUL_DISCOVERY_REGISTER:false}
-        # Register health check in consul. Useful during development of a service.
-        registerHealthCheck: ${SPRING_CLOUD_CONSUL_DISCOVERY_REGISTERHEALTHCHECK:false}
-        # Alternate server path to invoke for health checking
-        healthCheckPath: /management/healthcheck
-        # Custom health check url to override default
-        #healthCheckUrl: ${SPRING_CLOUD_CONSUL_DISCOVERY_HEALTHCHECKURL}
-        # How often to perform the health check (e.g. 10s), defaults to 10s.
-        healthCheckInterval: ${SPRING_CLOUD_CONSUL_DISCOVERY_HEALTHCHECKINTERVAL:15s}
-        # Timeout for health check (e.g. 10s).
-        healthCheckTimeout: ${SPRING_CLOUD_CONSUL_DISCOVERY_HEALTHCHECKTIMEOUT:15s}
-        # Timeout to deregister services critical for longer than timeout (e.g. 30m).
-        healthCheckCriticalTimeout: ${SPRING_CLOUD_CONSUL_DISCOVERY_HEALTHCHECKCRITICALTIMEOUT:10m}
-        # Tags to use when registering service
-        tags: project_name=${spring.application.name}, maven_version=${project.version}, commit_id=${git.commit.id}, commit_time=${git.commit.time}, profiles_active=${spring.profiles.active}
-        # Hostname to use when accessing server.
-        hostname: ${SPRING_CLOUD_CONSUL_DISCOVERY_HOSTNAME:localhost}
-        # Use ip address rather than hostname during registration
-        prefer-ip-address: ${SPRING_CLOUD_CONSUL_DISCOVERY_PREFER_IP_ADDRESS:false}
-        # IP address to use when accessing service (must also set preferIpAddress to use)
-        ipAddress: ${SPRING_CLOUD_CONSUL_DISCOVERY_IPADDRESS:127.0.0.1}
-        # Port to register the service under (defaults to listening port)
-        #port: ${SPRING_CLOUD_CONSUL_DISCOVERY_PORT}
-    config:
-      # Flag to say that remote configuration is enabled. (default false).
-      enabled: ${SPRING_CLOUD_CONFIG_ENABLED:false}
-      # Flag to indicate that failure to connect to the server is fatal (default false).
-      failFast: ${SPRING_CLOUD_CONFIG_FAILFAST:false}
-      discovery:
-        # Flag to indicate that config server discovery is enabled (config server URL will be looked up via discovery). (default false).
-        enabled: ${SPRING_CLOUD_CONFIG_DISCOVERY_ENABLED:false}
-        # Service id to locate config server.
-        serviceId: ${SPRING_CLOUD_CONFIG_DISCOVERY_SERVICEID:config-server}
-    inetutils:
-      ignored-interfaces:
-        - vbox*
-        - bridge*
-        - docker0
-        - veth.*
-        - lo*
-      preferredNetworks:
-        - 192.168
-        - 10.0
-
+spring.application.name: '@project.artifactId@'
+spring.application.version: '@project.version@'
+spring.profiles.active: ${SPRING_PROFILES_ACTIVE:local}
 spring.main.allow-bean-definition-overriding: true # Enable bean override
 
----
-spring.config.activate.on-profile: local
 # ----------------------------------------
 # ACTUATOR PROPERTIES
 # ----------------------------------------
@@ -93,13 +13,13 @@ management.endpoints.web.exposure.include: '*' # Endpoint IDs that should be inc
 management.endpoints.web.exposure.exclude:  # Endpoint IDs that should be excluded or '*' for all.
 management.endpoints.web.base-path: /management # Base path for Web endpoints. Relative to server.servlet.context-path or management.server.servlet.context-path if management.server.port is configured.
 management.endpoints.web.path-mapping.health: healthcheck
-
 # HEALTH ENDPOINT
 management.endpoint.health.cache.time-to-live: 0ms # Maximum time that a response can be cached.
 management.endpoint.health.enabled: true # Whether to enable the health endpoint.
 management.endpoint.health.roles:  # Roles used to determine whether or not a user is authorized to be shown details. When empty, all authenticated users are authorized.
 management.endpoint.health.show-details: always # When to show full health details.
-
+management.health.circuitbreakers.enabled: true
+management.health.ratelimiters.enabled: true
 # INFO CONTRIBUTORS (InfoContributorProperties)
 management.info.build.enabled: true # Whether to enable build info.
 management.info.defaults.enabled: true # Whether to enable default info contributors.
@@ -107,22 +27,8 @@ management.info.env.enabled: true # Whether to enable environment info.
 management.info.git.enabled: true # Whether to enable git info.
 management.info.git.mode: full # Mode to use to expose git information.
 
-# LOGGING
-logging.config: classpath:log4j2-local.xml # Location of the logging configuration file. For instance, `classpath:logback.xml` for Logback.
-logging.file: log4j2-local.xml # Log file name (for instance, `myapp.log`). Names can be an exact location or relative to the current directory.
-logging.level: # Log levels severity mapping. For instance, `logging.level.org.springframework: DEBUG`.
-  org.springframework: INFO
-  com.cjrequena.sample: DEBUG
-  com.zaxxer.hikari.HikariConfig: INFO
-  org.hibernate.type.descriptor.sql.BasicBinder: ERROR
-  org.flywaydb: INFO
-
-
-# H2
-#spring.datasource.h2.url: jdbc:h2:mem:testdb;MODE=PostgreSQL
-#spring.datasource.h2.driverClassName: org.h2.Driver
-#spring.datasource.h2.username: sa
-#spring.h2.console.enabled: true
+---
+spring.config.activate.on-profile: local
 
 # Postgres
 spring.datasource.postgres.type: com.zaxxer.hikari.HikariDataSource
@@ -153,7 +59,7 @@ spring.jpa.properties.hibernate.id.new_generator_mappings: false
 spring.jpa.properties.hibernate.search.autoregister_listeners: false
 spring.jpa.properties.hibernate.bytecode.use_reflection_optimizer: false
 
-# swagger configuration
+# SWAGGER
 springdoc:
   api-docs:
     groups:
@@ -163,8 +69,3 @@ springdoc:
     display-request-duration: true
     groups-order: DESC
   version: '@springdoc.version@'
-
-#
-spring.cloud:
-  loadbalancer.ribbon:
-    enabled: false

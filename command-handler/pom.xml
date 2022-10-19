@@ -2,19 +2,21 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-    <modelVersion>4.0.0</modelVersion>
-    <artifactId>command-handler</artifactId>
     <parent>
         <artifactId>event-sourcing-cqrs-eventstoredb-sample</artifactId>
         <groupId>com.cjrequena.sample</groupId>
         <version>1.0-SNAPSHOT</version>
     </parent>
+    <modelVersion>4.0.0</modelVersion>
+    <artifactId>command-handler</artifactId>
+    <packaging>jar</packaging>
     <properties>
-        <!-- -->
+        <maven.compiler.source>11</maven.compiler.source>
+        <maven.compiler.target>11</maven.compiler.target>
         <start-class>com.cjrequena.sample.CommandHandlerMainApplication</start-class>
     </properties>
     <dependencies>
-        <!-- Spring Boot -->
+        <!-- spring boot -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter</artifactId>
@@ -56,57 +58,6 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-log4j2</artifactId>
         </dependency>
-        <!-- Spring Cloud -->
-        <dependency>
-            <groupId>org.springframework.cloud</groupId>
-            <artifactId>spring-cloud-config-client</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.cloud</groupId>
-            <artifactId>spring-cloud-starter-consul-discovery</artifactId>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.springframework.cloud</groupId>
-                    <artifactId>spring-cloud-starter-netflix-hystrix</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.springframework.cloud</groupId>
-                    <artifactId>spring-cloud-netflix-hystrix</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.springframework.cloud</groupId>
-                    <artifactId>spring-cloud-starter-netflix-ribbon</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.springframework.cloud</groupId>
-                    <artifactId>spring-cloud-netflix-core</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.springframework.cloud</groupId>
-                    <artifactId>spring-cloud-starter-netflix-archaius</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>com.netflix.ribbon</groupId>
-                    <artifactId>ribbon</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>com.netflix.ribbon</groupId>
-                    <artifactId>ribbon-core</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>com.netflix.ribbon</groupId>
-                    <artifactId>ribbon-httpclient</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>com.netflix.ribbon</groupId>
-                    <artifactId>ribbon-loadbalancer</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.cloud</groupId>
-            <artifactId>spring-cloud-starter-sleuth</artifactId>
-        </dependency>
         <!-- Database -->
         <dependency>
             <groupId>com.eventstore</groupId>
@@ -118,7 +69,7 @@
         <dependency>
             <groupId>io.grpc</groupId>
             <artifactId>grpc-api</artifactId>
-            <version>1.40.1</version>
+            <version>1.40.1</version> <!-- TODO -->
         </dependency>
         <!-- Swagger -->
         <dependency>

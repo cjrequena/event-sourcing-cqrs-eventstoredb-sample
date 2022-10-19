@@ -2,9 +2,6 @@ package com.cjrequena.sample.service;
 
 import com.cjrequena.sample.common.EventStoreDBUtils;
 import com.cjrequena.sample.configuration.EventStoreDBConfiguration;
-import com.cjrequena.sample.event.BankAccountCratedEvent;
-import com.cjrequena.sample.event.BankAccountDepositedEvent;
-import com.cjrequena.sample.event.BankAccountWithdrawnEvent;
 import com.cjrequena.sample.event.Event;
 import com.cjrequena.sample.exception.service.OptimisticConcurrencyServiceException;
 import com.eventstore.dbclient.*;
@@ -14,10 +11,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.List;
+import java.util.Objects;
+import java.util.UUID;
 import java.util.concurrent.ExecutionException;
 
-import static com.cjrequena.sample.common.Constants.*;
 import static com.eventstore.dbclient.ExpectedRevision.NO_STREAM;
 import static com.eventstore.dbclient.ExpectedRevision.expectedRevision;
 
@@ -67,29 +66,12 @@ public class EventStoreService {
   }
 
   @SneakyThrows
-  public List<Event> retrieveEventsByAggregateId(UUID aggregateId) {
+  public List<ResolvedEvent> retrieveEventsByAggregateId(UUID aggregateId) {
     try {
       Objects.requireNonNull(aggregateId);
       log.debug("Reading events for aggregate {}", aggregateId);
-      List<ResolvedEvent> resolvedEvents;
-      List<Event> events = new ArrayList<>();
       ReadResult result = eventStoreDBClient.readStream(EventStoreDBUtils.toStream(aggregateId)).get();
-      resolvedEvents = result.getEvents();
-      for (ResolvedEvent resolvedEvent : resolvedEvents) {
-        RecordedEvent originalEvent = resolvedEvent.getOriginalEvent();
-        switch (originalEvent.getEventType()) {
-          case BANK_ACCOUNT_CREATED_EVENT_V1:
-            events.add( originalEvent.getEventDataAs((BankAccountCratedEvent.class)));
-            break;
-          case BANK_ACCOUNT_DEPOSITED_EVENT_V1:
-            events.add( originalEvent.getEventDataAs((BankAccountDepositedEvent.class)));
-            break;
-          case BANK_ACCOUNT_WITHDRAWN_EVENT_V1:
-            events.add( originalEvent.getEventDataAs((BankAccountWithdrawnEvent.class)));
-            break;
-        }
-      }
-      return events;
+      return result.getEvents();
     } catch (ExecutionException ex) {
       Throwable innerException = ex.getCause();
       if (innerException instanceof StreamNotFoundException) {
