@@ -41,7 +41,9 @@ public class EventStoreService {
     try {
       Objects.requireNonNull(aggregateId);
       log.debug("Reading events for aggregate {}", aggregateId);
-      ReadResult result = eventStoreDBClient.readStream(EventStoreDBUtils.toStream(aggregateId)).get();
+      ReadResult result = eventStoreDBClient.readStream(EventStoreDBUtils.toStream(aggregateId), ReadStreamOptions.get()
+        .forwards()
+        .fromStart()).get();
       return result.getEvents();
     } catch (ExecutionException ex) {
       Throwable innerException = ex.getCause();
@@ -55,20 +57,18 @@ public class EventStoreService {
 
   @SneakyThrows
   public void subscribe(Consumer<RecordedEvent> consumer, String selector) {
-    PersistentSubscriptionSettings persistentSubscriptionSettings = PersistentSubscriptionSettings
-      .builder()
-      .fromStart()
-      .resolveLinkTos()
-      .consumerStrategy(ConsumerStrategy.Pinned)
-      .build();
+    CreatePersistentSubscriptionToStreamOptions persistentSubscriptionSettings =
+      CreatePersistentSubscriptionToStreamOptions.get()
+        .fromStart()
+        .resolveLinkTos()
+        .namedConsumerStrategy(NamedConsumerStrategy.PINNED);
 
     try {
       persistentSubscriptionsClient
-        .create(selector, eventStoreDBConfiguration.getPersistentSubscription().getGroup(), persistentSubscriptionSettings)
+        .createToStream(selector, eventStoreDBConfiguration.getPersistentSubscription().getGroup(), persistentSubscriptionSettings)
         .get();
     } catch (ExecutionException ex) {
-      if (ex.getCause() instanceof StatusRuntimeException) {
-        StatusRuntimeException innerException = (StatusRuntimeException) ex.getCause();
+      if (ex.getCause() instanceof StatusRuntimeException innerException) {
         if (innerException.getStatus().getCode() == Status.ALREADY_EXISTS.getCode()) {
           log.info(innerException.getMessage());
         } else {
@@ -79,22 +79,23 @@ public class EventStoreService {
 
     SubscribePersistentSubscriptionOptions subscribePersistentSubscriptionOptions = SubscribePersistentSubscriptionOptions
       .get()
-      .setBufferSize(eventStoreDBConfiguration.getPersistentSubscription().getBufferSize());
+      .bufferSize(eventStoreDBConfiguration.getPersistentSubscription().getBufferSize());
 
-    persistentSubscriptionsClient.subscribe(
+    persistentSubscriptionsClient.subscribeToStream(
       selector,
       eventStoreDBConfiguration.getPersistentSubscription().getGroup(),
       subscribePersistentSubscriptionOptions,
       new PersistentSubscriptionListener() {
 
         @Override
-        public void onEvent(PersistentSubscription subscription, ResolvedEvent resolvedEvent) {
+        public void onEvent(PersistentSubscription subscription, int retryCount, ResolvedEvent resolvedEvent) {
           RecordedEvent recordedEvent = resolvedEvent.getEvent();
           log.debug(
-            "Received event {}@{} from subscription {}",
+            "Received event {}@{} from subscription {} and retry {}",
             recordedEvent.getStreamId(),
-            recordedEvent.getStreamRevision().getValueUnsigned(),
-            subscription.getSubscriptionId());
+            recordedEvent.getRevision(),
+            subscription.getSubscriptionId(),
+            retryCount);
           try {
             consumer.accept(recordedEvent);
             subscription.ack(resolvedEvent);
@@ -103,7 +104,7 @@ public class EventStoreService {
               String.format(
                 "Error processing event %s@%s from subscription %s: %s",
                 recordedEvent.getStreamId(),
-                recordedEvent.getStreamRevision().getValueUnsigned(),
+                recordedEvent.getRevision(),
                 subscription.getSubscriptionId(),
                 e.getMessage()),
               e);
@@ -113,12 +114,12 @@ public class EventStoreService {
 
         @Override
         public void onError(PersistentSubscription subscription, Throwable throwable) {
-          System.out.println("Subscription was dropped due to " + throwable.getMessage());
+          log.warn("Subscription was dropped due to " + throwable.getMessage());
         }
 
         @Override
         public void onCancelled(PersistentSubscription subscription) {
-          System.out.println("Subscription is cancelled");
+          log.warn("Subscription is cancelled");
         }
       });
   }

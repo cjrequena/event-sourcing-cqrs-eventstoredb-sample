@@ -5,7 +5,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>2.7.3</version>
+        <version>3.0.2</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <modelVersion>4.0.0</modelVersion>
@@ -14,17 +14,17 @@
     <version>1.0-SNAPSHOT</version>
     <packaging>pom</packaging>
     <properties>
-        <java.version>11</java.version>
+        <java.version>17</java.version>
         <!-- https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-dependencies -->
         <spring-boot-dependencies.version>2.7.3</spring-boot-dependencies.version>
         <!-- https://mvnrepository.com/artifact/org.springframework.cloud/spring-cloud-dependencies -->
-        <spring-cloud-dependencies.version>2021.0.3</spring-cloud-dependencies.version>
+        <spring-cloud-dependencies.version>2022.0.0</spring-cloud-dependencies.version>
         <!-- https://mvnrepository.com/artifact/org.springdoc/springdoc-openapi-webflux-ui -->
-        <springdoc.version>1.6.11</springdoc.version>
+        <springdoc.version>2.0.2</springdoc.version>
         <!-- https://mvnrepository.com/artifact/com.eventstore/db-client-java -->
-        <com.eventstore.db-client-java.version>2.0.0</com.eventstore.db-client-java.version>
+        <com.eventstore.db-client-java.version>4.1.1</com.eventstore.db-client-java.version>
         <!--https://mvnrepository.com/artifact/org.mapstruct/mapstruct-->
-        <mapstruct.version>1.4.2.Final</mapstruct.version>
+        <mapstruct.version>1.5.3.Final</mapstruct.version>
     </properties>
     <modules>
         <module>command-handler</module>

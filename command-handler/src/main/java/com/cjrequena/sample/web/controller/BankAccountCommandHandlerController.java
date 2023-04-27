@@ -32,8 +32,8 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.validation.Valid;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
 
 import static com.cjrequena.sample.common.Constants.VND_SAMPLE_SERVICE_V1;
 import static org.springframework.http.HttpHeaders.CACHE_CONTROL;

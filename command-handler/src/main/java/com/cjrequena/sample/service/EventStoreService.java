@@ -17,8 +17,7 @@ import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.ExecutionException;
 
-import static com.eventstore.dbclient.ExpectedRevision.NO_STREAM;
-import static com.eventstore.dbclient.ExpectedRevision.expectedRevision;
+
 
 /**
  * <p>
@@ -42,16 +41,15 @@ public class EventStoreService {
     try {
       Objects.requireNonNull(event);
       EventData eventData = EventData.builderAsJson(event.getType().getValue(), event).build();
-      AppendToStreamOptions options = AppendToStreamOptions.get().expectedRevision(expectedVersion != null ? expectedRevision(expectedVersion) : NO_STREAM);
-      eventStoreDBClient
+      AppendToStreamOptions options = AppendToStreamOptions.get().expectedRevision(expectedVersion != null ? ExpectedRevision.expectedRevision(expectedVersion) : ExpectedRevision.noStream());
+      WriteResult writeResult = eventStoreDBClient
         .appendToStream(EventStoreDBUtils.toStream(event.getAggregateId()), options, eventData)
-        .get()
-        .getNextExpectedRevision()
-        .getValueUnsigned();
+        .get();
+
+      log.info("Event stored with id [{}] and version [{}]", event.getAggregateId().toString(), writeResult.getNextExpectedRevision().toString());
     } catch (ExecutionException ex) {
-      if (ex.getCause() instanceof WrongExpectedVersionException) {
-        WrongExpectedVersionException innerException = (WrongExpectedVersionException) ex.getCause();
-        long actualRevision = innerException.getActualVersion().getValueUnsigned();
+      if (ex.getCause() instanceof WrongExpectedVersionException innerException) {
+        String actualRevision = innerException.getActualVersion().toString();
         log.debug(
           "Optimistic concurrency control error in aggregate {}: actual version is {} but expected {}",
           event.getAggregateId(),
@@ -70,7 +68,9 @@ public class EventStoreService {
     try {
       Objects.requireNonNull(aggregateId);
       log.debug("Reading events for aggregate {}", aggregateId);
-      ReadResult result = eventStoreDBClient.readStream(EventStoreDBUtils.toStream(aggregateId)).get();
+      ReadResult result = eventStoreDBClient.readStream(EventStoreDBUtils.toStream(aggregateId), ReadStreamOptions.get()
+        .forwards()
+        .fromStart()).get();
       return result.getEvents();
     } catch (ExecutionException ex) {
       Throwable innerException = ex.getCause();
