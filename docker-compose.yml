@@ -2,8 +2,9 @@ version: '3.8'
 
 services:
   eventstore:
-    image: eventstore/eventstore:21.10.2-buster-slim
-    container_name: eventstoredb
+    image: eventstore/eventstore:22.10.1-alpha-arm64v8 # for mac m1
+    #image: eventstore/eventstore:22.10.1-buster-slim
+    #container_name: eventstoredb
     hostname: eventstoredb
     environment:
       - EVENTSTORE_CLUSTER_SIZE=1
@@ -29,8 +30,8 @@ services:
     restart: unless-stopped
   #---------------------------------------------------------------------------------------------------------------------
   postgres:
-    image: postgres
-    container_name: postgres-8e61
+    image: postgres:latest
+    #container_name: postgres
     hostname: postgres
     environment:
       POSTGRES_USER: ${POSTGRES_USER:-postgres}
